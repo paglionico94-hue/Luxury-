@@ -1,0 +1,31 @@
+name: Compila Luxury Acquaviva Android
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Prepara icona originale
+        run: |
+          mkdir -p app/src/main/res/mipmap-hdpi
+          curl -fLSs --retry 3 "https://headless-nwpdqsrbioi-paglionico94-140c.wix-site-host.com/icon-512.png" -o app/src/main/res/mipmap-hdpi/ic_launcher.png
+          file app/src/main/res/mipmap-hdpi/ic_launcher.png
+      - name: Compila APK di prova
+        run: |
+          gradle --version
+          gradle --no-daemon :app:assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LuxuryAcquaviva-APK-di-prova
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 30
